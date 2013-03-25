@@ -44,15 +44,15 @@ module ActiveRecord
                 if open_transactions == 0
                   if database_transaction_rollback.is_a?(::ActiveRecord::DeadlockVictim)
                     # SQL Server has already rolled back, so rollback activerecord's history
-                    rollback_transaction_records(true)
+                    rollback_transaction
                     retry
                   else
                     rollback_db_transaction
-                    rollback_transaction_records(true)
+                    rollback_transaction
                   end
                 else
                   rollback_to_savepoint
-                  rollback_transaction_records(false)
+                  rollback_transaction
                 end
               end
               raise unless database_transaction_rollback.is_a?(::ActiveRecord::Rollback)
@@ -79,10 +79,10 @@ module ActiveRecord
               rescue Exception => database_transaction_rollback
                 if open_transactions == 0
                   rollback_db_transaction
-                  rollback_transaction_records(true)
+                  rollback_transaction
                 else
                   rollback_to_savepoint
-                  rollback_transaction_records(false)
+                  rollback_transaction
                 end
                 raise
               end
