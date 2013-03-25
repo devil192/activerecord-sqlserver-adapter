@@ -9,7 +9,7 @@ module ActiveRecord
           # do deadlock retry logic. Because this is a copy, we really need to keep an eye out on this when
           # upgradding the adapter. 
           def transaction_with_retry_deadlock_victim(options = {})
-            options.assert_valid_keys :requires_new, :joinable
+            options.assert_valid_keys :requires_new, :joinable, :isolation
 
             last_transaction_joinable = defined?(@transaction_joinable) ? @transaction_joinable : nil
             if options.has_key?(:joinable)
@@ -67,7 +67,7 @@ module ActiveRecord
               begin
                 if open_transactions == 0
                   commit_db_transaction
-                  commit_transaction_records
+                  commit_transaction
                 else
                   release_savepoint
                   save_point_records = @_current_transaction_records.pop
